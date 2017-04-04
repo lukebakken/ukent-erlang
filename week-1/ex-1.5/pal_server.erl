@@ -24,7 +24,7 @@ handle_palindrome_check(true, Str) ->
     Msg = lists:flatten(io_lib:format("\"~s\" is a palindrome", [Str])),
     {result, Msg};
 handle_palindrome_check(false, Str) ->
-    Msg = lists:flatten(io_lib:format("\"~s\S is not a palindrome", [Str])),
+    Msg = lists:flatten(io_lib:format("\"~s\" is not a palindrome", [Str])),
     {result, Msg}.
 
 rem_punct(Str, Regex) ->
