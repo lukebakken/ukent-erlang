@@ -1,19 +1,19 @@
 -module(pal_server).
 
--export([server/1]).
+-export([server/0]).
 
-server(Pid) ->
+server() ->
     Regex = get_regex(),
-    server(Pid, Regex).
+    server(Regex).
 
-server(Pid, Regex) ->
+server(Regex) ->
     receive
         stop ->
             io:format("server stopping~n");
         {check, Pid, Str} ->
             Rslt = handle_palindrome_check(palindrome_check(Str, Regex), Str),
             Pid ! Rslt,
-            server(Pid, Regex)
+            server(Regex)
     end.
 
 palindrome_check(Str, Regex) ->
