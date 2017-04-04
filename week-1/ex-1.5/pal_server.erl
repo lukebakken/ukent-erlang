@@ -3,22 +3,36 @@
 -export([server/1]).
 
 server(Pid) ->
-server(Pid, State) ->
+    Regex = get_regex(),
+    server(Pid, Regex).
+
+server(Pid, Regex) ->
     receive
         stop ->
             io:format("server stopping~n");
-        {check, Str} ->
+        {check, Pid, Str} ->
+            Rslt = handle_palindrome_check(palindrome_check(Str, Regex), Str),
+            Pid ! Rslt,
+            server(Pid, Regex)
     end.
 
-palindrome_check(Str) ->
-    NStr = to_small(rem_punct(Str)),
-    lists:reverse(Nstr) == NStr.
+palindrome_check(Str, Regex) ->
+    NStr = to_small(rem_punct(Str, Regex)),
+    lists:reverse(NStr) == NStr.
 
-rem_punct(Str) ->
-    re:replace(Str, Regex, "", [global]).
+handle_palindrome_check(true, Str) ->
+    Msg = lists:flatten(io_lib:format("\"~s\" is a palindrome", [Str])),
+    {result, Msg};
+handle_palindrome_check(false, Str) ->
+    Msg = lists:flatten(io_lib:format("\"~s\S is not a palindrome", [Str])),
+    {result, Msg}.
+
+rem_punct(Str, Regex) ->
+    re:replace(Str, Regex, "", [global, {return, list}]).
 
 to_small(Str) ->
 	string:to_lower(Str).
 
 get_regex() ->
-    {ok, Regex} = re:compile("[[:punct:]]"),
+    {ok, Regex} = re:compile("[[:punct:][:space:]]"),
+    Regex.
